@@ -1,0 +1,127 @@
+1 Phân biệt Process và Thread
+Khi một ứng dụng Android được khởi chạy, thì hệ thống Android sẽ start một Process cho ứng dụng đó cùng với một Thread duy nhất để thực thi. Như vậy là: cả Process và Thread đều được sinh ra khi ứng dụng được khởi chạy, và số lượng được tạo ra là 1 Process và 1 Thread.
+
+Process sẽ cung cấp tài nguyên cần thiết để thực thi chương trình (Program). Mỗi Process có một không gian địa chỉ ảo, có các mã thực thi, có các lệnh xử lý các đối tượng hệ thống, kích thước làm việc tối thiểu và tối đa, ... và phải có ít nhất một Thread thực thi.
+
+Như vậy thì: Thread là một thực thể trong một Process, là đối tượng được lên kế hoạch để thực thi một nhiệm vụ nào đó.
+
+Có thể có nhiều Thread trong một Process, mỗi Thread lại có 1 công việc riêng của nó và sẽ chiếm một phần tài nguyên hệ thống trong Process.
+
+Tóm lại bạn chỉ cần nhớ:
+Process = Program (chương trình cần thực hiện) + all Threads executing in Program (tất cả các Thread thực thi chương trình đó).
+
+1.2 Thread và Multiple Thread
+Khái niệm: Thread được định nghĩa là một luồng dùng để thực thi một chương trình. Java Virtual Machine cho phép một chương trình có thể có nhiều Thread thực thi đồng thời, mỗi một Thead sẽ thực thi một nhiệm vụ riêng của nó.
+
+Mỗi Thread đều có độ ưu tiên riêng. Thread có thể được đánh dấu là daemon.
+Daemon Thread là một loại Thread có độ ưu tiên thấp, nó duy trì hoạt động cho đến khi tất cả các Threads khác hoàn thành công việc hay chết đi thì nó mới chết theo.
+Ví dụ cụ thể: là Trình dọn rác trong Java là một Daemon Thread.
+
+Cách tạo Thread:
+Để tạo mới Thread chúng ta có hai cách:
+Cách thứ nhất: là kế thừa (extends) từ class Thread
+Cách thứ 2 là thực thi (implements) interface Runnable
+
+Trong Java chỉ có đơn kế thừa nên cách thứ hai sẽ linh động hơn. Tùy vào bài toán mà bạn có thể chọn cách sử dụng cho thích hợp.
+
+Multiple Thread dịch ra tiếng việt là đa luồng, hay nhiều Thread. Tức là trong một chương trình, có thể có đồng thời nhiều Thread được thực thi.
+
+Khi một chương trình nhiều công việc mà chỉ có một Thread thực thi thì sẽ không hiệu quả, như vậy nhiều Thread đồng thời làm việc thì công việc sẽ hiệu quả hơn rất nhiều.
+
+Khi có nhiều Thread, mỗi một Thread sẽ chiếm một lượng không gian tài nguyên nhất định, số lượng Thread càng nhiều thì độ phức tạp sẽ càng lớn, nên phải sử dụng cho hợp lý, nếu không thì chương trình sẽ xảy ra xung đột, quá trình thực thi sẽ sai, thậm chí có thể gây chết chương trình.
+---------------------------------------------------------------------------------
+1. Main Thread / UI Thread, Worker Thread / Background Thread.
+Trong Android, khi chương trình được khởi chạy, hệ thống sẽ start một Thread ban đầu cùng với một Process. Thì Thread đó chính là Main Thread.
+
+Trong Android: Main Thread lại thường được gọi là UI Thread bởi vì có 2 lý do chính sau đây.
+- Thread này có nhiệm vụ gửi các sự kiện đến widget, tức là đến các view ở giao diện điện thoại, thậm chí cả các sự kiện vẽ (draw).
+- Ngoài ra Thread này cũng phải tương tác với bộ công cụ Android UI (Android UI Toolkit) gồm hai gói thư viện là android.widget và android.view.
+
+Có khi nào Main Thread lại không được gọi là UI Thread không? Đó là khi một chương trình có nhiều hơn một Thread phụ trách việc xử lý giao diện.
+
+Còn một trường hợp nữa là Worker Thread, chính là Thread mà bạn tạo thêm cho chương trình để nó thực thi một công việc nào đó không liên quan đến giao diện, Thread này cũng được gọi là Background Thread.
+
+2. Hiện tượng ANR trong Android
+ANR là viết tắt của Application not Responding
+
+Khi có nhiều thứ được thực thi trên UI Thread, và có một công việc gì đó cần phải thực hiện lâu như kết nối mạng hay truy vấn cơ sở dữ liệu, khi đó UI sẽ bị block. Người dùng cảm thấy như ứng dụng đang bị treo, nhưng thực ra nó đang thực thi công việc của mình trên UI Thread. Nếu UI bị block hơn vài giây (trung bình là 5 giây) thì hệ thống Android sẽ xuất hiện hộp thoại như trên, cho phép người dùng có thể đóng chương trình hoặc chờ đợi. Nếu như ứng dụng thường xuyên có những hiện tượng như vậy thì sẽ bất tiện cho người dùng.
+
+Chính vì vậy, để không xảy ra hiện tượng trên thì Android là đề ra 2 rules sau đây yêu cầu lập trình viên phải tuân theo:
+- Không được block UI Thread.
+- Không được kết nối tới bộ công cụ Android UI (Android UI toolkit) từ một Thread không phải là UI Thread.
+
+
+------------------------------------------------------------------------
+1. Reactive Programing
+Reactive Programing là một phương pháp lập trình tập trung vào các luồng dữ liệu không đồng bộ và quan sát sự thay đổi của các luồng dữ liệu không đồng bộ đó, khi có sự thay đổi sẽ có hành động xử lý phù hợp. Vì đây là luồng dữ liệu không đồng bộ nên các module code cùng lúc chạy trên các thread khác nhau từ đó rút ngắn thời gian thực thi mà không làm block main thread.
+
+Một số thuật ngữ liên quan:
+- synchronous: đồng bộ, tuần tự
+- asynchronous: không đồng bộ, bất đồng bộ
+
+Lấy một ví dụ đơn giản là x = y + z, trong đó tổng của y và z được gán cho x. Trong reactive programming, khi giá trị y thay đổi thì x cũng tự động thay đổi theo mà không cần phải thực hiện lại câu lệnh x = y + z. Điều này có thể nhận được khi ta lắng nghe, quan sát giá trị của y và z.
+
+2. Reactive Extension
+Reactive Extension (ReactiveX hay RX) là một thư viện follow theo những quy tắc của Reactive Programming tức là nó soạn ra các chương trình bất đồng bộ và dựa trên sự kiện bằng cách sử dụng các chuỗi quan sát được. Các thư viện này cung cấp một list các interface và method giúp các developers viết code một cách đơn giản và sáng sủa hơn.
+
+Rx là sự kết hợp của những ý tưởng tốt nhất từ Observer pattern, Iterator pattern và functional programming.
+
+Reactive Extension có trên rất nhiều ngôn ngữ khác nhau như C++ (RxCpp), C# (Rx.NET), Java (RxJava), Kotlin (RxKotlin) Swift (RxSwift), ...
+---------------------------------------------------------------------
+1. RxJava
+* Khái niệm: Reactive Extension (ReactiveX hay RX) sử dụng ngôn ngữ Java → RxJava
+
+* Những thành phần quan trọng trong RxJava:
+Về cơ bản RxJava có hai thành phần chính: Observable và Observer
+Thêm vào đó, có những thứ khác như Schedulers, Operators và Subscription là các thành phần đóng vai trò như đa luồng, thao tác dữ liệu và kết nối.
+
+Chúng ta sẽ cùng làm quen với từng thành phần:
+Observable: Là luồng dữ liệu thực hiện một số công việc và phát ra dữ liệu.
+Observer : Là thành phần đi kèm không thể thiếu của Observable. Nó nhận dữ liệu được phát ra bởi Observable.
+Subcription: Là mối liên kết giữa Observable và Observer. Có thể có nhiều Observer đăng ký một Observable duy nhất.
+Operator: Hỗ trợ cho việc sửa đổi dữ liệu được phát ra bởi Observable trước khi Observer nhận chúng.
+Schedulers: Scheduler quyết định thread mà Observable sẽ phát ra dữ liệu và trên thread nào Observer sẽ nhận dữ liệu.
+Disposable : Disposable được sử dụng để hủy sự kết nối của Observer với Observable khi không còn cần thiết việc này rất hữu dụng để tránh việc rò rỉ bộ nhớ.
+
+* Các loại Observable và Observer
+Chúng ta có 5 loại Observable đi kèm là 5 loại Observer tương ứng
+Observable  - Observer
+Single - SingleObserver
+Maybe - MaybeObserver
+Flowable - Observer
+Completable - CompletableObserver
+
+2. RxAndroid
+RxAndroid được đặc biệt sử dụng cho nền tảng Android được phát triển dựa trên RxJava. Đặc biệt Schedulers được bổ sung cho RxAndroid nhằm hỗ trợ cho đa luồng trong ứng dụng Android. Schedulers sẽ giúp bạn phân chia luồng chạy cho từng module code sao cho phù hợp.
+
+Một vài luồng chạy phổ biến được sử dụng qua Schedulers.
+
+Schedulers.io(): Được sử dụng để thực hiện các hoạt động không tốn nhiều CPU như thực \\hiện cuộc gọi mạng, đọc đĩa/tệp, thao tác cơ sở dữ liệu, v.v.
+AndroidSchedulers.mainThread(): Cung cấp quyền truy cập vào Android Main Thread/UI Thread.
+Schedulers.newThread(): Thread mới sẽ được tạo ra mỗi khi một nhiệm vụ được tạo
+
+------------------ Cách tạo Observable bằng cách Observable---------------
+
+1.Observable.create()
+Với create(), bạn có thể tự thiết kế hoạt động của Observer bằng cách gọi các phương thức onError, onNext, và onCompleted một cách thích hợp.
+Lưu ý là Subscriber.onComplete()
+hoặc Subscriber.onError() chỉ được gọi duy nhất 1 lần và sau đó không được gọi thêm bất cứ hàm nào khác của Observer.
+
+2.Observable.fromArray() - phat tung item
+fromArray chuyển đổi một list (mảng) object dữ liệu nào đó thành một Observable.
+Sau đó Observable sẽ phát ra lần lượt các item đó, và chúng được xử lí trong onNext.
+Sau khi hoàn thành sẽ gọi đến onCompleted().
+
+3.Observable.just() - phat ca mang Array
+ just() chuyển đổi một object hoặc một tập hợp các object thành Observable và phát ra nó.
+ Với just(), giả sử nếu truyền vào 1 array thì array đó sẽ được chuyển đổi thành Observable và phát ra chính array đó.
+4.Observable.interval()
+ interval() tạo một Observable phát ra một chuỗi các số nguyên cách nhau một khoảng thời gian cụ thể.
+5.Observable.timer()
+  timer() tạo 1 Observable sẽ phát ra 1 item sau 1 khoảng thời gian delay cho trước.
+6.Observable.range() - phat trong 1 pham vi nao do
+  Range() tạo 1 Observable từ 1 dải interger và lần lượt phát ra các interger trong dải đó.
+7.Observable.repeat()
+  Repeat() tạo 1 Observable mà có thể lặp đi lặp lại việc phát ra dữ liệu. Bạn có thể hạn chế số lần lặp lại bằng cách set repeat(số lần lặp).
+8.Observable.defer()
+  defer() không tạo ra Observable cho đến khi có ít nhất 1 subcriber được đăng kí và nó sẽ luôn tạo mới 1 observable tương ứng với mỗi subcriber.
