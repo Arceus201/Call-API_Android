@@ -107,20 +107,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
        btnUploadImg.setOnClickListener(this);
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v==btnSelectImg){
-            onClickRequestPermission();
-        }
-        if(v==btnUploadImg){
-            if(mUri!=null){
-                callApiRegisterAccount();
-            }
-        }
-    }
-
-
-
     //check version va cho phep quyen
     private void onClickRequestPermission() {
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
@@ -134,6 +120,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             requestPermissions(permission, MY_REQUEST_CODE);
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        if(v==btnSelectImg){
+            onClickRequestPermission();
+        }
+        if(v==btnUploadImg){
+            if(mUri!=null){
+                callApiRegisterAccount();
+            }
+        }
+    }
+
+
     //lang nghe nguoi dung cho phep hay tu choi permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -146,14 +146,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
     }
-
-    private void openGallery() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        mActivityResultLauncher.launch((Intent.createChooser(intent, "Select Picture")));
-    }
-
     private void callApiRegisterAccount() {
         progressDialog.show();
 
@@ -190,4 +182,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
+
+    private void openGallery() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        mActivityResultLauncher.launch((Intent.createChooser(intent, "Select Picture")));
+    }
+
 }
